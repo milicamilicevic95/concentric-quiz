@@ -1,512 +1,737 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Find Your Council — Concentric</title>
-<meta name="description" content="Six women, placed by moment — not industry or title. Two minutes to find out which council fits where you are right now." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #f3eee5;
-    --ink: #24211d;
-    --ink-soft: #6b6459;
-    --gold: #a2793f;
-    --gold-soft: #b89463;
-    --line: #d8cfc0;
-    --white: #fffdf9;
-  }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    overflow-x: hidden;
-  }
-  .serif { font-family: 'Cormorant Garamond', serif; }
-  .bg-circles {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .bg-circles svg { width: 100%; height: 100%; }
-  .app {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 28px 48px;
-  }
-  .wordmark {
-    font-size: 15px;
-    letter-spacing: 3px;
-    font-weight: 500;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .wordmark .accent { color: var(--gold); }
-  .back-link {
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: var(--ink-soft);
-    text-decoration: none;
-    text-transform: uppercase;
-  }
-  .back-link:hover { color: var(--ink); }
-  main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: 0 48px 64px;
-  }
-  .screen {
-    display: none;
-    width: 100%;
-    max-width: 620px;
-    animation: fadeIn 0.5s ease;
-  }
-  .screen.active { display: block; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .eyebrow {
-    font-size: 12px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 18px;
-    font-weight: 500;
-  }
-  h1.headline {
-    font-size: 58px;
-    font-weight: 400;
-    line-height: 1.05;
-    margin: 0 0 28px;
-  }
-  h1.headline em {
-    font-style: italic;
-    color: var(--gold);
-  }
-  .sub {
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--ink-soft);
-    max-width: 460px;
-    margin-bottom: 34px;
-  }
-  .council-tags {
-    display: flex;
-    gap: 0;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-  }
-  .council-tags span {
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    border: 1px solid var(--line);
-    padding: 9px 16px;
-    margin-right: -1px;
-  }
-  button, .btn {
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    border: none;
-  }
-  .btn-primary {
-    background: var(--ink);
-    color: var(--white);
-    font-size: 13px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 17px 30px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    transition: opacity 0.2s ease;
-  }
-  .btn-primary:hover { opacity: 0.85; }
-  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where do you belong? — Concentric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
-  .q-eyebrow {
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-bottom: 20px;
-  }
-  h2.question {
-    font-size: 34px;
-    font-weight: 400;
-    line-height: 1.2;
-    margin: 0 0 36px;
-  }
-  .options { border-top: 1px solid var(--line); }
-  .option {
-    display: flex;
-    gap: 18px;
-    padding: 22px 4px;
-    border-bottom: 1px solid var(--line);
-    cursor: pointer;
-    border-left: 3px solid transparent;
-    padding-left: 16px;
-    transition: all 0.15s ease;
-  }
-  .option:hover { padding-left: 22px; }
-  .option .num {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    color: var(--ink-soft);
-    font-size: 15px;
-    padding-top: 2px;
-    min-width: 18px;
-  }
-  .option .txt {
-    font-size: 18px;
-    line-height: 1.5;
-    color: var(--ink);
-  }
-  .option.selected {
-    border-left-color: var(--gold);
-    background: linear-gradient(90deg, rgba(162,121,63,0.06), transparent);
-  }
-  .option.selected .num,
-  .option.selected .txt {
-    color: var(--gold);
-  }
+  <!-- META PIXEL — replace YOUR_PIXEL_ID -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','YOUR_PIXEL_ID');
+    fbq('track','PageView');
+  </script>
 
-  form .field { margin-bottom: 22px; }
-  form label {
-    display: block;
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-bottom: 8px;
-  }
-  form input {
-    width: 100%;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    padding: 13px 2px;
-    border: none;
-    border-bottom: 1px solid var(--line);
-    background: transparent;
-    color: var(--ink);
-    outline: none;
-  }
-  form input:focus { border-bottom-color: var(--gold); }
-  .footnote {
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-top: 20px;
-  }
-  .footnote a { color: var(--ink-soft); }
-  .error-msg {
-    font-size: 13px;
-    color: #a23f3f;
-    margin-top: -8px;
-    margin-bottom: 16px;
-    display: none;
-  }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .check-circle {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    border: 1px solid var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold);
-    font-size: 20px;
-    margin-bottom: 24px;
-  }
-  .social-links {
-    margin-top: 30px;
-    font-size: 13px;
-    color: var(--ink-soft);
-  }
-  .social-links a {
-    color: var(--ink);
-    text-decoration: none;
-    margin-left: 6px;
-  }
-  .social-links a:hover { color: var(--gold); }
+    :root {
+      --cream: #F4F0E8;
+      --ink:   #20211F;
+      --brass: #9A7548;
+      --stone: #C8C0B4;
+      --tint:  #EDE9DF;
+      --stone-faint: #E2DDD5;
+    }
 
-  @media (max-width: 640px) {
-    header { padding: 22px 24px; }
-    main { padding: 0 24px 48px; }
-    h1.headline { font-size: 40px; }
-    h2.question { font-size: 26px; }
-    .council-tags span { font-size: 10px; padding: 7px 12px; }
-  }
-</style>
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100svh;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── CIRCLES SVG BACKGROUND ── */
+    .circles-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .circles-bg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 40px;
+    }
+    .nav-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .nav-logo em { color: var(--brass); font-style: normal; }
+    .nav-back {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--stone);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--ink); }
+
+    /* ── SCREENS ── */
+    .screen {
+      display: none;
+      position: relative;
+      z-index: 1;
+      min-height: 100svh;
+      padding: 100px 40px 60px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .screen.active { display: flex; }
+
+    .inner {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(52px, 12vw, 80px);
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--brass);
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(28px, 6vw, 40px);
+      line-height: 1.2;
+      margin-bottom: 40px;
+    }
+    h2 em {
+      font-style: italic;
+      color: var(--brass);
+    }
+
+    .lede {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--ink);
+      opacity: 0.75;
+      margin-bottom: 36px;
+      max-width: 400px;
+    }
+
+    /* ── TAGS ── */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+    .tag {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--stone);
+      border: 1px solid var(--stone-faint);
+      padding: 6px 12px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 16px 32px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--brass); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--stone);
+    }
+    .btn-ghost:hover { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+    /* ── PROGRESS ── */
+    .progress-track {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--stone-faint);
+      z-index: 200;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--brass);
+      transition: width 0.5s ease;
+    }
+    .q-count {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 32px;
+      display: block;
+    }
+
+    /* ── ANSWER OPTIONS ── */
+    .answers { margin-top: 4px; }
+
+    .answer-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--stone-faint);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .answer-opt:first-child { border-top: 1px solid var(--stone-faint); }
+    .answer-opt::before {
+      content: '';
+      position: absolute;
+      left: -40px;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--brass);
+      transform: scaleY(0);
+      transition: transform 0.2s ease;
+    }
+    .answer-opt:hover::before,
+    .answer-opt.chosen::before { transform: scaleY(1); }
+
+    .answer-opt:hover .answer-text,
+    .answer-opt.chosen .answer-text { color: var(--brass); }
+
+    .answer-marker {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--stone);
+      min-width: 16px;
+      padding-top: 1px;
+      transition: color 0.2s;
+    }
+    .answer-opt:hover .answer-marker,
+    .answer-opt.chosen .answer-marker { color: var(--brass); }
+
+    .answer-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(16px, 3.5vw, 20px);
+      font-weight: 300;
+      line-height: 1.4;
+      color: var(--ink);
+      transition: color 0.2s;
+    }
+
+    /* ── RESULT ── */
+    .result-council {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brass);
+      border: 1px solid var(--brass);
+      display: inline-block;
+      padding: 7px 14px;
+      margin-bottom: 28px;
+    }
+    .result-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(36px, 8vw, 56px);
+      line-height: 1.05;
+      margin-bottom: 10px;
+    }
+    .result-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--brass);
+      margin-bottom: 28px;
+    }
+    .result-body {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--ink);
+      opacity: 0.8;
+      margin-bottom: 14px;
+    }
+    .result-section {
+      margin-top: 32px;
+    }
+    .result-section-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 12px;
+    }
+    .council-what {
+      background: var(--tint);
+      border-left: 2px solid var(--brass);
+      padding: 20px 22px;
+      margin-top: 32px;
+    }
+    .council-what-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 10px;
+    }
+    .council-what p {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--ink);
+      opacity: 0.8;
+    }
+    .rule {
+      width: 40px;
+      height: 1px;
+      background: var(--brass);
+      margin: 32px 0;
+    }
+
+    /* ── FORM ── */
+    .form-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+    .form-sub {
+      font-size: 13px;
+      color: var(--ink);
+      opacity: 0.6;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+    .field input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--stone);
+      padding: 10px 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+      border-radius: 0;
+      -webkit-appearance: none;
+    }
+    .field input:focus { border-color: var(--brass); }
+    .field input::placeholder { color: var(--stone); font-style: italic; }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 18px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover { background: var(--brass); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .privacy {
+      font-size: 11px;
+      color: var(--ink);
+      opacity: 0.55;
+      margin-top: 14px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .privacy a { color: var(--ink); }
+
+    .quiz-meta-line {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--stone);
+      margin-bottom: 36px;
+    }
+
+    .reassurance {
+      font-size: 13px;
+      color: var(--ink);
+      opacity: 0.6;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+
+    .form-optional {
+      font-size: 11px;
+      color: var(--stone);
+      margin-top: 20px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* ── SUCCESS ── */
+    .success-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 1px solid var(--brass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      color: var(--brass);
+    }
+
+    /* ── FADE IN ── */
+    .screen.active { animation: fadeUp 0.4s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 520px) {
+      nav { padding: 20px 24px; }
+      .screen { padding: 90px 24px 60px; }
+      .answer-opt::before { left: -24px; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="bg-circles">
-  <svg viewBox="0 0 1470 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <g fill="none" stroke="#24211d" stroke-opacity="0.12" stroke-width="1">
-      <circle cx="180" cy="380" r="360"/>
-      <circle cx="740" cy="120" r="300"/>
-      <circle cx="1300" cy="500" r="380"/>
-      <circle cx="420" cy="700" r="260"/>
-      <circle cx="1050" cy="780" r="220"/>
-    </g>
+<!-- Background circles (matching site aesthetic) -->
+<div class="circles-bg">
+  <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="180" cy="300" r="280" stroke="#D4CCBf" stroke-width="1"/>
+    <circle cx="820" cy="180" r="240" stroke="#D4CCBf" stroke-width="1"/>
+    <circle cx="500" cy="700" r="330" stroke="#D4CCBf" stroke-width="0.8"/>
+    <circle cx="900" cy="620" r="190" stroke="#D4CCBf" stroke-width="0.8"/>
+    <circle cx="280" cy="640" r="160" stroke="#D4CCBf" stroke-width="0.8"/>
   </svg>
 </div>
 
-<div class="app">
-  <header>
-    <a class="wordmark" href="https://concentric-pilot.netlify.app/">CON<span class="accent">C</span>ENTRIC</a>
-    <a class="back-link" href="https://concentric-pilot.netlify.app/">← Back to site</a>
-  </header>
-
-  <main>
-
-    <!-- LANDING -->
-    <section class="screen active" id="screen-landing">
-      <div class="eyebrow">Peer councils for professional women</div>
-      <h1 class="headline serif">Find <em>your</em> council.</h1>
-      <p class="sub">Six women, placed by moment — not industry or title. Two minutes to find out which council fits where you are right now.</p>
-      <div class="council-tags">
-        <span>Transition Council</span>
-        <span>Visibility Council</span>
-        <span>Recalibration Council</span>
-      </div>
-      <button class="btn btn-primary" onclick="goTo('q1')">Begin →</button>
-    </section>
-
-    <!-- QUESTION TEMPLATE (5 screens) -->
-    <section class="screen" id="screen-q1" data-q="1">
-      <div class="q-eyebrow">Question 1 of 5</div>
-      <h2 class="question serif">Right now, which of these feels most true?</h2>
-      <div class="options">
-        <div class="option" data-value="recalibration"><span class="num">i.</span><span class="txt">I've been running hard for a long time. Now I'm trying to find my pace again.</span></div>
-        <div class="option" data-value="visibility"><span class="num">ii.</span><span class="txt">Everything looks fine on paper. But something doesn't add up.</span></div>
-        <div class="option" data-value="transition"><span class="num">iii.</span><span class="txt">I'm in the middle of a significant change, and navigating most of it alone.</span></div>
-      </div>
-    </section>
-
-    <section class="screen" id="screen-q2" data-q="2">
-      <div class="q-eyebrow">Question 2 of 5</div>
-      <h2 class="question serif">When you think about your career right now, what's the loudest feeling?</h2>
-      <div class="options">
-        <div class="option" data-value="transition"><span class="num">i.</span><span class="txt">I'm rebuilding — after a role ended, a decision I made, or a change I didn't choose.</span></div>
-        <div class="option" data-value="recalibration"><span class="num">ii.</span><span class="txt">I'm depleted. The work that used to energise me now just empties me out.</span></div>
-        <div class="option" data-value="visibility"><span class="num">iii.</span><span class="txt">I'm capable of more than what I'm currently being seen for.</span></div>
-      </div>
-    </section>
-
-    <section class="screen" id="screen-q3" data-q="3">
-      <div class="q-eyebrow">Question 3 of 5</div>
-      <h2 class="question serif">What do you find yourself doing most often, professionally?</h2>
-      <div class="options">
-        <div class="option" data-value="visibility"><span class="num">i.</span><span class="txt">Delivering quietly, and wondering why it isn't translating into what's next.</span></div>
-        <div class="option" data-value="transition"><span class="num">ii.</span><span class="txt">Figuring out who I am now that the old plan doesn't apply.</span></div>
-        <div class="option" data-value="recalibration"><span class="num">iii.</span><span class="txt">Getting through the week without thinking too far past it.</span></div>
-      </div>
-    </section>
-
-    <section class="screen" id="screen-q4" data-q="4">
-      <div class="q-eyebrow">Question 4 of 5</div>
-      <h2 class="question serif">Which sentence would a close friend say about you right now?</h2>
-      <div class="options">
-        <div class="option" data-value="recalibration"><span class="num">i.</span><span class="txt">She's running on fumes and won't admit it.</span></div>
-        <div class="option" data-value="transition"><span class="num">ii.</span><span class="txt">She's between chapters, and it's unsettling her more than she lets on.</span></div>
-        <div class="option" data-value="visibility"><span class="num">iii.</span><span class="txt">She's underestimated for someone doing that much.</span></div>
-      </div>
-    </section>
-
-    <section class="screen" id="screen-q5" data-q="5">
-      <div class="q-eyebrow">Question 5 of 5</div>
-      <h2 class="question serif">What are you hoping six other women could help with, right now?</h2>
-      <div class="options">
-        <div class="option" data-value="transition"><span class="num">i.</span><span class="txt">Perspective from people who've actually rebuilt something, not just cheered from the sidelines.</span></div>
-        <div class="option" data-value="visibility"><span class="num">ii.</span><span class="txt">A push, and the confidence to ask for what I'm worth.</span></div>
-        <div class="option" data-value="recalibration"><span class="num">iii.</span><span class="txt">Permission to slow down without falling behind.</span></div>
-      </div>
-    </section>
-
-    <!-- RESULT + WAITLIST FORM -->
-    <section class="screen" id="screen-result">
-      <div class="eyebrow">Your result</div>
-      <h1 class="headline serif" id="result-heading" style="font-size:44px;">Save your place.</h1>
-      <p class="sub" id="result-sub">Pilot cohort opens October 2026. Six women per council. We'll be in touch when yours opens.</p>
-
-      <form id="waitlist-form" novalidate>
-        <div class="field">
-          <label for="firstName">First name</label>
-          <input type="text" id="firstName" name="firstName" placeholder="Your name" required />
-        </div>
-        <div class="field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@email.com" required />
-        </div>
-        <div class="error-msg" id="form-error">Please add your name and a valid email.</div>
-        <button type="submit" class="btn btn-primary" id="submit-btn">Join the waitlist →</button>
-      </form>
-      <p class="footnote">No marketing. Read our <a href="https://concentric-pilot.netlify.app/legal.dc#privacy" target="_blank" rel="noopener">privacy policy</a>.</p>
-    </section>
-
-    <!-- SUCCESS -->
-    <section class="screen" id="screen-success">
-      <div class="check-circle">✓</div>
-      <h1 class="headline serif" style="font-size:40px;">You're on the list</h1>
-      <p class="sub" id="success-sub">We matched you to a council based on your answers. We'll reach out as your cohort opens.</p>
-      <div class="social-links">
-        Follow along ·
-        <a href="https://linkedin.com/company/concentricwomen" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://instagram.com/concentricwomen" target="_blank" rel="noopener">Instagram</a>
-      </div>
-    </section>
-
-  </main>
+<!-- Progress bar -->
+<div class="progress-track" id="progress-track" style="display:none">
+  <div class="progress-fill" id="progress-fill" style="width:0%"></div>
 </div>
 
-<!-- Meta Pixel (fill in your Pixel ID below) -->
-<script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', 'YOUR_PIXEL_ID_HERE');
-  fbq('track', 'PageView');
-</script>
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="https://concentric-pilot.netlify.app/">CON<em>C</em>ENTRIC</a>
+  <a class="nav-back" href="https://concentric-pilot.netlify.app/">← Back to site</a>
+</nav>
+
+<!-- ══════════ START ══════════ -->
+<div class="screen active" id="screen-start">
+  <div class="inner">
+    <div class="eyebrow">Early access · Coming soon</div>
+    <h1>Where <em>do you</em><br>belong?</h1>
+    <p class="lede">We're building something new for professional women who are done with one-size-fits-all advice. Five questions to find out where you fit — and get early access when we launch.</p>
+    <p class="quiz-meta-line">Five questions &nbsp;·&nbsp; Two minutes &nbsp;·&nbsp; Free</p>
+    <button class="btn" onclick="startQuiz()">Begin &nbsp;→</button>
+    <p class="reassurance">You get your result instantly. No sign-up required.</p>
+  </div>
+</div>
+
+<!-- ══════════ QUESTIONS ══════════ -->
+<div class="screen" id="screen-questions">
+  <div class="inner">
+    <span class="q-count" id="q-count">Question 1 of 5</span>
+    <h2 id="q-text"></h2>
+    <div class="answers" id="answers-wrap"></div>
+  </div>
+</div>
+
+<!-- ══════════ RESULT ══════════ -->
+<div class="screen" id="screen-result">
+  <div class="inner">
+
+    <div class="eyebrow">Your result</div>
+    <div class="result-council" id="result-council-tag"></div>
+    <div class="result-title" id="result-title"></div>
+    <div class="result-sub" id="result-sub"></div>
+
+    <p class="result-body" id="result-reveal"></p>
+
+    <div class="result-section">
+      <div class="result-section-label">Who else ends up here</div>
+      <p class="result-body" id="result-who"></p>
+    </div>
+
+    <div class="council-what">
+      <div class="council-what-label">What a council looks like</div>
+      <p id="result-council-desc"></p>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="form-heading">Get early access.</div>
+    <p class="form-sub">Pilot opens October 2026. Six women per council. We'll be in touch when yours is ready.</p>
+    <form onsubmit="submitForm(event)">
+      <input type="hidden" id="council-val">
+      <div class="field">
+        <label>First name</label>
+        <input type="text" id="f-name" placeholder="Your name" required autocomplete="given-name">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="f-email" placeholder="you@email.com" required autocomplete="email">
+      </div>
+      <button type="submit" class="submit-btn" id="submit-btn">Save my place &nbsp;→</button>
+    </form>
+    <p class="privacy" style="margin-top:16px">Optional. By entering your email you'll be added to our newsletter via Beehiiv — unsubscribe anytime. <a href="/privacy">Privacy policy</a>.</p>
+
+  </div>
+</div>
+
+<!-- ══════════ SUCCESS ══════════ -->
+<div class="screen" id="screen-success">
+  <div class="inner" style="text-align:center">
+    <div class="success-ring" style="margin:0 auto 32px">✓</div>
+    <div class="eyebrow" style="text-align:center">You're on the list</div>
+    <h2 style="margin-bottom:16px" id="success-heading"></h2>
+    <p class="result-body" style="max-width:380px;margin:0 auto 8px;text-align:center" id="success-body"></p>
+    <p class="result-body" style="max-width:380px;margin:0 auto 36px;text-align:center;font-size:13px">We don't send marketing. You'll only hear from us when your council is ready.</p>
+    <div class="rule" style="margin:0 auto 32px"></div>
+    <p style="font-size:11px;color:var(--stone);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;text-align:center">Follow along while we build</p>
+    <p style="font-size:12px;color:var(--stone);letter-spacing:0.08em;text-align:center">
+      <a href="https://linkedin.com/company/concentricwomen" style="color:var(--brass);text-decoration:none">LinkedIn</a>
+      &nbsp;&nbsp;·&nbsp;&nbsp;
+      <a href="https://instagram.com/concentricwomen" style="color:var(--brass);text-decoration:none">Instagram</a>
+    </p>
+  </div>
+</div>
 
 <script>
-  // ---- Quiz state ----
-  const answers = {}; // { q1: 'transition', q2: 'recalibration', ... }
-  const COUNCIL_LABELS = {
-    transition: 'Transition',
-    visibility: 'Visibility & Momentum',
-    recalibration: 'Recalibration',
-  };
-  const COUNCIL_COPY = {
-    transition: {
-      sub: "Your answers point to the Transition Council — for women stepping out, stepping back, or rebuilding after significant change.",
-    },
-    visibility: {
-      sub: "Your answers point to the Visibility & Momentum Council — for women who are capable of more than they're currently being seen for.",
-    },
-    recalibration: {
-      sub: "Your answers point to the Recalibration Council — for women navigating burnout recovery and reinvention after demanding roles.",
-    },
-  };
-
-  let resultCouncil = null;
-
-  function goTo(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + id).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+/* ── QUIZ DATA ────────────────────────────────────────
+   A = Transition · B = Visibility · C = Recalibration
+──────────────────────────────────────────────────── */
+const Qs = [
+  {
+    text: "Right now, which of these feels most true?",
+    opts: [
+      { t: "I'm in the middle of a significant change, and navigating most of it alone.", c: "A" },
+      { t: "Everything looks fine on paper. But something doesn't add up.", c: "B" },
+      { t: "I've been running hard for a long time. Now I'm trying to find my pace again.", c: "C" },
+    ]
+  },
+  {
+    text: "What does your inner monologue sound like most days?",
+    opts: [
+      { t: "'Who am I in this next chapter?'", c: "A" },
+      { t: "'Why doesn't this feel like enough?'", c: "B" },
+      { t: "'I need to stop — but I don't know how without the guilt.'", c: "C" },
+    ]
+  },
+  {
+    text: "Which of these is hardest to admit out loud?",
+    opts: [
+      { t: "I don't know where I'm going, and that scares me.", c: "A" },
+      { t: "I'm lost — even though my CV says otherwise.", c: "B" },
+      { t: "I'm more depleted than I've let anyone know.", c: "C" },
+    ]
+  },
+  {
+    text: "In a room with five other honest women, what would matter most?",
+    opts: [
+      { t: "The feeling that there's no right pace — and that's okay.", c: "A" },
+      { t: "Permission to say what I actually mean, without qualifying it.", c: "B" },
+      { t: "Somewhere that doesn't expect me to have the next move figured out.", c: "C" },
+    ]
+  },
+  {
+    text: "The sentence you most need to hear right now:",
+    opts: [
+      { t: "\"There's no right way to do this.\"", c: "A" },
+      { t: "\"You don't have to qualify how you're feeling.\"", c: "B" },
+      { t: "\"You don't have to be anywhere yet.\"", c: "C" },
+    ]
   }
+];
 
-  // Wire up each question screen
-  document.querySelectorAll('section[data-q]').forEach(section => {
-    const qNum = section.getAttribute('data-q');
-    section.querySelectorAll('.option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        section.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        answers['q' + qNum] = opt.getAttribute('data-value');
+const COUNCILS = {
+  A: {
+    tag: "Transition Council",
+    title: "You're mid-change.",
+    sub: "And doing most of it in your head.",
+    reveal: "Women who score here are at the hinge point of something — a role they're leaving, an identity they're rebuilding, a chapter that ended differently than they planned. The change might look voluntary from the outside. From the inside, it rarely feels simple.",
+    who: "Others in this council tend to be mid-career: some left something significant by choice, others didn't. Different industries, different stories — but the same experience of navigating a threshold without a map, and the specific exhaustion of having to explain it to people who mean well.",
+    councilDesc: "Six women, placed by career moment — not industry, title, or age. You meet monthly. There's no agenda to perform against and no expectation to have the next move figured out. The value is the room: what becomes possible when you stop having to translate yourself.",
+    sh: "You're on the list.",
+    sb: "We'll be in touch when The Transition Council opens in October 2026."
+  },
+  B: {
+    tag: "Visibility & Momentum Council",
+    title: "You've done everything right.",
+    sub: "So why doesn't it feel like it?",
+    reveal: "Women who score here are typically high-performing by any external measure — strong track record, respected in their field, often senior or on their way there. The gap isn't in their capability. It's between how their career looks and how it actually feels to be inside it.",
+    who: "Others in this council are usually in roles they worked hard to reach. Visible in the right rooms. Ticking the boxes. The common thread is a quiet sense of misalignment — and the particular exhaustion of holding that privately, because from the outside everything looks fine.",
+    councilDesc: "Six women, placed by career moment — not industry, title, or age. You meet monthly. No qualifying, no performing, no need to lead with your CV. The value is finally being in a room where you can say what you actually mean without spending ten minutes on context first.",
+    sh: "You're on the list.",
+    sb: "We'll be in touch when The Visibility & Momentum Council opens in October 2026."
+  },
+  C: {
+    tag: "Recalibration Council",
+    title: "You've given a lot.",
+    sub: "Now you're figuring out the pace.",
+    reveal: "Women who score here aren't recovering from failure — they're recalibrating from experience. They gave everything to something demanding: a role, a company, a version of themselves that worked until it didn't. Now they're asking what comes next, and trying to answer that without the guilt.",
+    who: "Others in this council have typically been high-output for a long time, often carrying real responsibility. They're not done with ambition. They're renegotiating the terms — and discovering that's harder to explain than it sounds, especially to people who see them as having it together.",
+    councilDesc: "Six women, placed by career moment — not industry, title, or age. You meet monthly. No urgency. No expectation to have the next chapter written. The room holds space for the question — not just the answer.",
+    sh: "You're on the list.",
+    sb: "We'll be in touch when The Recalibration Council opens in October 2026."
+  }
+};
 
-        setTimeout(() => {
-          const nextQ = parseInt(qNum, 10) + 1;
-          if (nextQ <= 5) {
-            goTo('q' + nextQ);
-          } else {
-            computeResult();
-            goTo('result');
-          }
-        }, 350);
-      });
+/* ── AIRTABLE CONFIG ── replace in your Airtable chat */
+const AIRTABLE_KEY   = "YOUR_AIRTABLE_API_KEY";
+const AIRTABLE_BASE  = "YOUR_BASE_ID";
+const AIRTABLE_TABLE = "Leads";
+
+/* ── STATE ── */
+let qi = 0, scores = {A:0,B:0,C:0}, result = null;
+const markers = ["i.","ii.","iii.","iv."];
+
+function startQuiz() {
+  document.getElementById("progress-track").style.display = "block";
+  showScreen("screen-questions");
+  renderQ(0);
+}
+
+function renderQ(i) {
+  const q = Qs[i];
+  // Shuffle
+  const opts = [...q.opts].sort(() => Math.random() - 0.5);
+
+  document.getElementById("q-count").textContent = `Question ${i+1} of ${Qs.length}`;
+  document.getElementById("q-text").innerHTML = q.text;
+  document.getElementById("progress-fill").style.width = `${(i/Qs.length)*100}%`;
+
+  const wrap = document.getElementById("answers-wrap");
+  wrap.innerHTML = "";
+  opts.forEach((o, idx) => {
+    const div = document.createElement("div");
+    div.className = "answer-opt";
+    div.innerHTML = `<span class="answer-marker">${markers[idx]}</span><span class="answer-text">${o.t}</span>`;
+    div.onclick = () => pick(o.c, div);
+    wrap.appendChild(div);
+  });
+}
+
+function pick(council, el) {
+  document.querySelectorAll(".answer-opt").forEach(d => d.classList.remove("chosen"));
+  el.classList.add("chosen");
+  scores[council]++;
+  setTimeout(() => {
+    qi++;
+    if (qi < Qs.length) { renderQ(qi); }
+    else showResult();
+  }, 380);
+}
+
+function showResult() {
+  result = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  const c = COUNCILS[result];
+  document.getElementById("progress-fill").style.width = "100%";
+  document.getElementById("result-council-tag").textContent = c.tag;
+  document.getElementById("result-title").textContent = c.title;
+  document.getElementById("result-sub").textContent = c.sub;
+  document.getElementById("result-reveal").textContent = c.reveal;
+  document.getElementById("result-who").textContent = c.who;
+  document.getElementById("result-council-desc").textContent = c.councilDesc;
+  document.getElementById("council-val").value = c.tag;
+  showScreen("screen-result");
+}
+
+async function submitForm(e) {
+  e.preventDefault();
+  const btn   = document.getElementById("submit-btn");
+  const name  = document.getElementById("f-name").value.trim();
+  const email = document.getElementById("f-email").value.trim();
+  const council = document.getElementById("council-val").value;
+  btn.disabled = true; btn.textContent = "Saving…";
+
+  try {
+    await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${AIRTABLE_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: { Name: name, Email: email, Council: council, Source: "Quiz", Date: new Date().toISOString().split("T")[0] }})
     });
-  });
+  } catch(err) { console.warn("Airtable:", err); }
 
-  function computeResult() {
-    const tally = { transition: 0, visibility: 0, recalibration: 0 };
-    Object.values(answers).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+  if (typeof fbq !== "undefined") fbq("track", "Lead", { content_name: council });
 
-    // Deterministic tie-break order: transition, recalibration, visibility
-    const order = ['transition', 'recalibration', 'visibility'];
-    resultCouncil = order.reduce((best, key) =>
-      tally[key] > tally[best] ? key : best, order[0]);
+  const c = COUNCILS[result];
+  document.getElementById("success-heading").textContent = c.sh;
+  document.getElementById("success-body").textContent = c.sb;
+  showScreen("screen-success");
+}
 
-    document.getElementById('result-sub').textContent = COUNCIL_COPY[resultCouncil].sub +
-      " Pilot cohort opens October 2026. Six women per council. We'll be in touch when yours opens.";
-  }
-
-  // ---- Waitlist submission ----
-  const form = document.getElementById('waitlist-form');
-  const submitBtn = document.getElementById('submit-btn');
-  const errorMsg = document.getElementById('form-error');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const firstName = document.getElementById('firstName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-    if (!firstName || !emailOk) {
-      errorMsg.style.display = 'block';
-      return;
-    }
-    errorMsg.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Joining…';
-
-    try {
-      const res = await fetch('/.netlify/functions/submit-quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName,
-          email,
-          council: COUNCIL_LABELS[resultCouncil],
-          answers,
-        }),
-      });
-
-      if (typeof fbq === 'function') {
-        fbq('track', 'Lead', { council: resultCouncil });
-      }
-
-      // Show success regardless of a slow/failed backend write —
-      // the visitor's experience shouldn't depend on it, but log failures.
-      if (!res.ok) {
-        console.error('Quiz submission failed to save to Airtable.');
-      }
-      goTo('success');
-    } catch (err) {
-      console.error('Quiz submission error:', err);
-      goTo('success');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Join the waitlist →';
-    }
-  });
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
 </script>
-
 </body>
 </html>
