@@ -712,11 +712,12 @@ async function submitForm(e) {
   btn.disabled = true; btn.textContent = "Saving…";
 
   try {
-    await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`, {
+    const res = await fetch('/.netlify/functions/submit-quiz', {
       method: "POST",
-      headers: { "Authorization": `Bearer ${AIRTABLE_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ fields: { Name: name, Email: email, Council: council, Source: "Quiz", Date: new Date().toISOString().split("T")[0] }})
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName: name, email: email, council: council.replace(/\s*Council$/, ""), answers: scores })
     });
+    if (!res.ok) console.warn("Airtable submit failed:", res.status);
   } catch(err) { console.warn("Airtable:", err); }
 
   if (typeof fbq !== "undefined") fbq("track", "Lead", { content_name: council });
